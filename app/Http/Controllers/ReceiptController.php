@@ -128,10 +128,6 @@ class ReceiptController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // dd($request->name);
-        $cover = Receipt::where('unique_id', $id)->first();
-        // dd($cover);
-        // Storage::delete($cover->cover);
         
         Receipt::where('unique_id', $id)->update([
             'name' => $request->name,
@@ -140,22 +136,8 @@ class ReceiptController extends Controller
             'ingredient_amount' => $request->ingredient_amount,
             'make_time' => $request->make_time,
             'ingredient' => $request->ingredient,
-            // 'cover' => $request->file('cover')->store('image')
         ]);
-
-
-        // $cover->cover = $request->file('cover')->store('image');
-        // $cover->save();
-
-        // Receipt::where('unique_id', $id)->update([
-        //     'cover' => $request->file('cover')->store('image')
-        // ]);
-        if($request->cover) {
-
-
-
-        }
-        
+       
         // update Tag
         $existingTag = Tag::where('receipt_id', $id)->get();
         if($request->tag) {
@@ -168,21 +150,6 @@ class ReceiptController extends Controller
                 $tag->tag = $tg['tag'];
                 $tag->receipt_id = $id;
                 $tag->save();
-            }
-        }
-
-        // update image
-        $existingImage = Image::where('receipt_id', $id)->get();
-        if($request->file('image')) {
-            foreach($existingImage as $exImg) {
-                Storage::delete($exImg->image);
-                $exImg->delete();
-            }
-
-            foreach($request->image as $img) {
-                $image = new Image();
-                $image->image = $img->store('image');
-                $image->save();
             }
         }
 

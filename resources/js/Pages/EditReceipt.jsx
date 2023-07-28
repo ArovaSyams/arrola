@@ -32,16 +32,18 @@ const EditReceipt = ({ receipt, categories, tags, tagList, images }) => {
     cover: null
   });
 
-  // console.log(data.name, data.description, data.category, data.image, data.tag, data.ingredient_amount, data.make_time, data.ingredient);
-  console.log(data.id, data.cover);
+  // console.log(receiptData.name, receiptData.description, receiptData.category, receiptData.image, receiptData.tag, receiptData.ingredient_amount, receiptData.make_time, receiptData.ingredient);
+  console.log(receiptData.name);
+
   // handle for add a tag to array
   const handleTag = (event, tag) => {
-    setData('tag', tag);
+    setReceiptData({ ...receiptData, tag:e.target.value });
   }
 
   // handle for store data
   const handleSubmit = () => {
-    put(`/receipt/${receipt.unique_id}`);
+
+    router.put(`/receipt/${receipt.unique_id}`, receiptData);
   }
 
   const handleEditCover = () => {
@@ -68,7 +70,7 @@ const EditReceipt = ({ receipt, categories, tags, tagList, images }) => {
         autoComplete="off"
         >
         <div >
-          <TextField value={data.name} onChange={(e) => setData('name', e.target.value)} id="outlined-basic" label="Name" variant="outlined" />
+          <TextField value={receiptData.name} onChange={(e) => setReceiptData({ ...receiptData, name: e.target.value })} id="outlined-basic" label="Name" variant="outlined" />
         </div>
         <div>
         <FormControl>
@@ -79,7 +81,7 @@ const EditReceipt = ({ receipt, categories, tags, tagList, images }) => {
             name="radio-buttons-group"
           >
             {categories.map((ctgr) => (
-              <FormControlLabel checked={receipt.category === ctgr.category && true} onChange={(e) => setData('category', ctgr.category)} value={ctgr.category} key={ctgr.id} control={<Radio />} label={ctgr.category} />
+              <FormControlLabel checked={receipt.category === ctgr.category && true} onChange={(e) => setReceiptData({ ...receiptData, category: e.target.value })} value={ctgr.category} key={ctgr.id} control={<Radio />} label={ctgr.category} />
             ))}
           </RadioGroup>
         </FormControl>
@@ -107,10 +109,10 @@ const EditReceipt = ({ receipt, categories, tags, tagList, images }) => {
           />
         </div>
         <div >
-          <TextField value={data.ingredient_amount} onChange={(e) => setData('ingredient_amount', e.target.value)} id="outlined-basic" label="Ingredient amounts" variant="outlined" />
+          <TextField value={receiptData.ingredient_amount} onChange={(e) => setReceiptData({ ...receiptData, ingredient_amount:e.target.value })} id="outlined-basic" label="Ingredient amounts" variant="outlined" />
         </div>
         <div >
-          <TextField value={data.make_time} onChange={(e) => setData('make_time', e.target.value)} id="outlined-basic" label="Make time" variant="outlined" />
+          <TextField value={receiptData.make_time} onChange={(e) => setReceiptData({ ...receiptData, make_time:e.target.value })} id="outlined-basic" label="Make time" variant="outlined" />
         </div>
         <div>
           <TextField
@@ -118,8 +120,8 @@ const EditReceipt = ({ receipt, categories, tags, tagList, images }) => {
             label="Description"
             multiline
             rows={4}
-            onChange={(e) => setData('description', e.target.value)}
-            value={data.description}
+            onChange={(e) => setReceiptData({ ...receiptData, description:e.target.value })}
+            value={receiptData.description}
             />
         </div>
         <div>
@@ -128,8 +130,8 @@ const EditReceipt = ({ receipt, categories, tags, tagList, images }) => {
             label="Ingredients"
             multiline
             rows={4}
-            onChange={(e) => setData('ingredient', e.target.value)}
-            value={data.ingredient}
+            onChange={(e) => setReceiptData({ ...receiptData, ingredient:e.target.value })}
+            value={receiptData.ingredient}
           />
         </div>
         <Button onClick={handleSubmit} variant="contained">Edit</Button>
