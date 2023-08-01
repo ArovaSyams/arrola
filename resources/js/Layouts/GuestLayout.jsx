@@ -4,7 +4,7 @@ import Navbar from '@/Components/Navbar'
 import React from 'react'
 import { Helmet } from 'react-helmet'
 
-const GuestLayout = ({ children }) => {
+const GuestLayout = ({ auth, children }) => {
   return (
     <body>
       {/* <div class="preloader">
@@ -15,7 +15,7 @@ const GuestLayout = ({ children }) => {
       </div> */}
 
       <HeadNav />
-      <Navbar />
+      <Navbar auth={auth} />
       <main>
         {children}
       </main>

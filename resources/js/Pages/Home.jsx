@@ -5,14 +5,15 @@ import GuestLayout from '@/Layouts/GuestLayout'
 import { Head } from '@inertiajs/react'
 import React from 'react'
 
-const Home = ({ receipts, images }) => {
+const Home = ({ receipts, images, user, auth }) => {
   return (
-    <GuestLayout>
+    <GuestLayout auth={auth}>
       <Head title="Arrola"  />
       <Hero title="Receipes" />
       <Receipts 
         receipts={receipts} 
         images={images}
+        user={user}
       />
     </GuestLayout>
   )

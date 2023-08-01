@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react'
 import React from 'react'
 
-const Navbar = () => {
+const Navbar = ({ auth }) => {
   return (
     <div className="navbar-area">
       <div className="mobile-responsive-nav">
@@ -28,16 +28,29 @@ const Navbar = () => {
 
               <ul className="navbar-nav m-auto">
                 <li className="nav-item">
-                  <Link href="receipes.html" className="nav-link">
+                  <Link href="/" className="nav-link">
                     Receipes
                   </Link>
                 </li>
               </ul>
 
               <div className="others-options d-flex align-items-center">
-                <div className="optional-item">
-                  <Link href="/register" className="default-btn two">Register</Link>
-                </div>
+                {auth ? (
+
+                  <div className="optional-item">
+                    <Link href={auth.role === 'admin' ? '/admin-dashboard' : '/dashboard'} className="default-btn two">Dashboard</Link>
+                  </div>
+                  
+                ) : (
+                  <>
+                  <div className="optional-item">
+                    <Link href="/login" className="default-btn two">Login</Link>
+                  </div>
+                  <div className="optional-item">
+                    <Link href="/register" className="default-btn two">Register</Link>
+                  </div>
+                  </>
+                )}
               </div>
 
               <div className="mobile-nav">

@@ -30,8 +30,14 @@ class ImageController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
+        $userImage = Image::where('receipt_id', $id)->get();
+
+        if(count($userImage) > 4) {
+            return redirect()->back()->with('message', 'Image cant contain more than 5');
+        }
+
         Image::create([
             'receipt_id' => $request->id,
             'image' => $request->file('image')->store('image')

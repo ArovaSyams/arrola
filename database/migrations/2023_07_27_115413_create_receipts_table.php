@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('status')->default('Inactive');
             $table->string('approved_by')->nullable();
             $table->string('cover');
+            $table->date('approved_at')->nullable();
             $table->timestamps();
         });
     }

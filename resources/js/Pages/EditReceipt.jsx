@@ -1,19 +1,11 @@
-import { Link, router, useForm } from '@inertiajs/react';
-import { Autocomplete, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Stack, TextField } from '@mui/material'
-import { useState } from 'react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
+import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Autocomplete } from '@mui/joy';
+import React, { useState } from 'react'
 
-const EditReceipt = ({ receipt, categories, tags, tagList, images }) => {
-  // const { data, setData, put, progress } = useForm({
-  //   name: receipt.name,
-  //   description: receipt.description,
-  //   category: receipt.category,
-  //   cover: '',
-  //   image: images,
-  //   tag: tags,
-  //   ingredient_amount: receipt.ingredient_amount,
-  //   make_time: receipt.make_time,
-  //   ingredient: receipt.ingredient
-  // });
+const EditReceipt = ({ receipt, categories, tags, tagList, images, auth }) => {
+  const { flash } = usePage().props;
+
   const [receiptData, setReceiptData] = useState({
     name: receipt.name,
     description: receipt.description,
@@ -26,23 +18,20 @@ const EditReceipt = ({ receipt, categories, tags, tagList, images }) => {
     ingredient: receipt.ingredient
   });
 
+  console.log(receiptData);
   const {data, setData, post, progress} = useForm({
     id: null,
     image: [],
     cover: null
   });
 
-  // console.log(receiptData.name, receiptData.description, receiptData.category, receiptData.image, receiptData.tag, receiptData.ingredient_amount, receiptData.make_time, receiptData.ingredient);
-  console.log(receiptData.name);
-
   // handle for add a tag to array
   const handleTag = (event, tag) => {
-    setReceiptData({ ...receiptData, tag:e.target.value });
+    setReceiptData({ ...receiptData, tag: tag });
   }
 
   // handle for store data
   const handleSubmit = () => {
-
     router.put(`/receipt/${receipt.unique_id}`, receiptData);
   }
 
@@ -51,7 +40,7 @@ const EditReceipt = ({ receipt, categories, tags, tagList, images }) => {
   }
 
   const handleCreateImage = () => {
-    post('/add-image');
+    post(`/add-image/${receipt.unique_id}`);
   }
 
   const handleDeleteImage = (id) => {
@@ -59,119 +48,199 @@ const EditReceipt = ({ receipt, categories, tags, tagList, images }) => {
   }
 
   return (
-    <div className="p-16" style={{ padding: 60 }}>
-      <h1 className="font-medium text-">Edit {receipt.name} Recipe</h1>
-      <Box
-        component="form"
-        sx={{
-          '& .MuiTextField-root': { my: 1, width: '50ch' },
-        }}
-        noValidate
-        autoComplete="off"
-        >
-        <div >
-          <TextField value={receiptData.name} onChange={(e) => setReceiptData({ ...receiptData, name: e.target.value })} id="outlined-basic" label="Name" variant="outlined" />
+    <AuthenticatedLayout user={auth}>
+      <Head title={`Edit ${receipt.name}`} />
+      <div class="page-wrapper">
+      <div class="content container-fluid">
+
+        <div class="page-header">
+        <div class="row">
+        <div class="col-sm-7 col-auto">
+        <h3 class="page-title">Edit Recipe</h3>
+        <ul class="breadcrumb">
+        <li class="breadcrumb-item active"><br/></li>
+        </ul>
         </div>
-        <div>
-        <FormControl>
-          <FormLabel id="demo-radio-buttons-group-label">Category</FormLabel>
-          <RadioGroup
-            aria-labelledby="demo-radio-buttons-group-label"
-            defaultValue="female"
-            name="radio-buttons-group"
-          >
-            {categories.map((ctgr) => (
-              <FormControlLabel checked={receipt.category === ctgr.category && true} onChange={(e) => setReceiptData({ ...receiptData, category: e.target.value })} value={ctgr.category} key={ctgr.id} control={<Radio />} label={ctgr.category} />
-            ))}
-          </RadioGroup>
-        </FormControl>
+
+
+
+        <div class="row">
+        <div class="col-md-12">
+        <div class="card">
+
+        <div class="card-body">
+
+        {/* <form onSubmit={handleSubmit}> */}
+        <div class="row">
+        <div class="col-xl-6">
+        <div class="form-group row">
+        <label class="col-lg-4 col-form-label">Recipe Name</label>
+        <div class="col-lg-8">
+        <input value={receiptData.name} onChange={(e) => setReceiptData({ ...receiptData, name: e.target.value })} type="text" class="form-control" />
         </div>
-        
-        <div className="mt-2">
+        </div>
+
+        <div class="form-group row">
+        <label class="col-lg-4 col-form-label">No of Incredients</label>
+        <div class="col-lg-8">
+        <input value={receiptData.ingredient_amount} onChange={(e) => setReceiptData({ ...receiptData, ingredient_amount:e.target.value })} type="text" class="form-control" />
+        </div>
+        </div>
+
+        <div class="form-group row">
+        <label class="col-lg-4 col-form-label">Incredients</label>
+        <div class="col-lg-8">
+        <input onChange={(e) => setReceiptData({ ...receiptData, ingredient:e.target.value })} value={receiptData.ingredient} type="text" class="form-control" />
+        </div>
+        </div>
+
+        <div class="form-group row">
+        <label class="col-lg-4 col-form-label">Preparation Method</label>
+        <div class="col-lg-8">
+        <textarea onChange={(e) => setReceiptData({ ...receiptData, description:e.target.value })} value={receiptData.description} class="form-control" cols="5"></textarea>
+        </div>
+        </div>
+
+        <div class="form-group row">
+        <label class="col-lg-4 col-form-label">Preparation Time</label>
+        <div class="col-lg-8">
+        <input value={receiptData.make_time} onChange={(e) => setReceiptData({ ...receiptData, make_time:e.target.value })} type="text" class="form-control" />
+        </div>
+        </div>
+
+        </div>
+        <div class="col-xl-6">
+        <div class="form-group row">
+        <label class="col-lg-4 col-form-label">Category</label>
+        <div class="col-lg-8">
+        <select class="form-select" onChange={(e) => setReceiptData({ ...receiptData, category: e.target.value })} >
+        <option>{receipt.category}</option>
+        {categories.map((ctgr) => (
+          <option key={ctgr.id} value={ctgr.category}>{ctgr.category}</option>
+        ))}
+        </select>
+        </div>
+        </div>
+        {/* <div class="form-group row">
+        <label class="col-lg-4 col-form-label">Tags</label>
+        <div class="col-lg-8">
+        <input type="text" class="form-control" onChange={handleTag} value={receiptData.tag}/>
+        </div>
+        </div> */}
+        <div className="form-group row">
+        <label className="col-lg-4 col-form-label">Tags</label>
+        <div className="col-lg-8">
           <Autocomplete
             multiple
-            id="tags-outlined"
+            id="tags-default"
+            placeholder="Favorites"
             options={tagList}
             getOptionLabel={(option) => option.tag}
-            defaultValue={tags.map((tag) => (
-              tag
-            ))}
             onChange={handleTag}
-            Tag
-            
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Tag"
-                placeholder="Favorites"
-              />
-            )}
+            defaultValue={tags.map((tag) => (tag))}
           />
         </div>
-        <div >
-          <TextField value={receiptData.ingredient_amount} onChange={(e) => setReceiptData({ ...receiptData, ingredient_amount:e.target.value })} id="outlined-basic" label="Ingredient amounts" variant="outlined" />
         </div>
-        <div >
-          <TextField value={receiptData.make_time} onChange={(e) => setReceiptData({ ...receiptData, make_time:e.target.value })} id="outlined-basic" label="Make time" variant="outlined" />
+        
         </div>
-        <div>
-          <TextField
-            id="outlined-multiline-static"
-            label="Description"
-            multiline
-            rows={4}
-            onChange={(e) => setReceiptData({ ...receiptData, description:e.target.value })}
-            value={receiptData.description}
-            />
-        </div>
-        <div>
-          <TextField
-            id="outlined-multiline-static"
-            label="Ingredients"
-            multiline
-            rows={4}
-            onChange={(e) => setReceiptData({ ...receiptData, ingredient:e.target.value })}
-            value={receiptData.ingredient}
-          />
-        </div>
-        <Button onClick={handleSubmit} variant="contained">Edit</Button>
-        {/* <button type="button" onClick={handleSubmit} className="px-3 py-2 mt-2 bg-green-500 text-white rounded-md">Submit</button> */}
-      </Box>
-    
-      <div style={{ marginTop: 60 }}>
-        <div>
-          <h4>Cover Image</h4>
-        </div>
-        <img src={`/storage/${receipt.cover}`} alt="" width={250}/>
-        <div>
-          <label htmlFor="">Cover Image</label>
-          <div className="mt-1">
-            <input type="file" onChange={(e) => setData('cover', e.target.files[0])} onClick={(e) => setData('id', receipt.unique_id)} />
-          </div>
-        </div>
-        <button type="submit" onClick={handleEditCover}>Edit Cover</button>
-      </div>
 
-      <hr />
-      <div >
-        <div>
-          <h4>Multiple Image</h4>
         </div>
-        {images.map((img) => (
-          <div style={{ marginBottom: 20 }}>
-            <img src={`/storage/${img.image}`} style={{ marginRight: 20 }} width={250} alt="" />
-            <button type="submit" onClick={() => handleDeleteImage(img.id)}  >Delete</button>
-          </div>
-        ))}
-        <div style={{ marginTop: 15 }}>
-          {/* <label htmlFor="">Multiple Image</label> */}
-          <div className="mt-1">
-            <input type="file" multiple onClick={(e) => setData('id', receipt.unique_id)} onChange={(e) => setData('image', e.target.files[0])} />
+        <div class="text-end">
+        {flash.message && (
+          <p style={{ color: 'red' }}>{flash.message}</p>
+        )}
+        <button onClick={handleSubmit} class="btn btn-primary">Edit</button>
+        </div>
+        {/* </form> */}
+        </div>
+        </div>
+        </div>
+        </div>
+
+        <div class="col-sm-7 col-auto">
+        <h3 class="page-title">Edit Cover</h3>
+        <ul class="breadcrumb">
+        <li class="breadcrumb-item active"><br/></li>
+        </ul>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+
+              <div class="card-body">
+              <div class="form-group row">
+              <label class="col-lg-2 col-form-label">
+              <img src={`/storage/${receipt.cover}`} alt="" width={150} style={{ borderRadius: 10 }} />
+              </label>
+              <div class="col-lg-10">
+              <input onChange={(e) => setData('cover', e.target.files[0])} onClick={(e) => setData('id', receipt.unique_id)} type="file" class="form-control" />
+              only jpg,png,jpeg allowed max size 512 kb
+              </div>
+              </div>
+
+              <div class="text-end">
+                <button onClick={handleEditCover} class="btn btn-primary">Edit</button>
+              </div>
+
+              </div>
+            </div>
           </div>
         </div>
-        <button type="submit" onClick={handleCreateImage}>Add Image</button>
+
+        <div class="col-sm-7 col-auto">
+        <h3 class="page-title">Edit Images</h3>
+        <ul class="breadcrumb">
+        <li class="breadcrumb-item active"><br/></li>
+        </ul>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+
+              <div class="card-body">
+              {images.map((img) => (
+              <div class="form-group row">
+              <label class="col-lg-2 col-form-label">
+                <img src={`/storage/${img.image}`} width={150} alt="" style={{ borderRadius: 10 }} />
+              </label>
+              <div class="col-lg-10">
+              {/* <input type="file" class="form-control" multiple /> */}
+              {/* only jpg,png,jpeg allowed max size 512 kb <br/> */}
+              <button className='btn btn-danger mt-2' type="submit" onClick={() => handleDeleteImage(img.id)}>Delete</button>
+              </div>
+              </div>
+
+              ))}
+              <hr />
+              <div class="form-group row mt-5">
+              <label class="col-lg-2 col-form-label">Images</label>
+              <div class="col-lg-10">
+              <input type="file" class="form-control" onClick={(e) => setData('id', receipt.unique_id)} onChange={(e) => setData('image', e.target.files[0])} />
+              only jpg,png,jpeg allowed max size 512 kb
+              </div>
+              </div>
+              <div class="text-end">
+              {flash.message && (
+                <p style={{ color: 'red' }}>{flash.message}</p>
+              )}
+                <button onClick={handleCreateImage} class="btn btn-primary">Add Images</button>
+              </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        </div>
+        </div>
+
       </div>
     </div>
+  </AuthenticatedLayout>
   )
 }
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import ReceiptCard from './ReceiptCard'
 
-const ReceiptCards = ({ receipts, images }) => {
+const ReceiptCards = ({ receipts, images, user }) => {
   // console.log(images);
   return (
     <div className="container">
@@ -9,12 +9,19 @@ const ReceiptCards = ({ receipts, images }) => {
 
         {receipts.map((receipt) => (
           <>
-            <ReceiptCard
-              name={receipt.name}
-              description={receipt.description.substring(0, 200)}
-              uniqueId={receipt.unique_id}
-              cover={receipt.cover}
-            />
+          {user.map((usr) => (
+            <>
+            {receipt.user_id === usr.id && (
+              <ReceiptCard
+                name={receipt.name}
+                description={receipt.description.substring(0, 200)}
+                uniqueId={receipt.unique_id}
+                cover={receipt.cover}
+                user={usr}
+              />
+            )}
+            </>
+          ))}
           </>
         ))}
       {/* {receipts.map((receipt) => (

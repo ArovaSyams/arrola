@@ -1,11 +1,14 @@
-import { useForm } from '@inertiajs/react';
-import { Autocomplete, Box, Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Stack, TextField } from '@mui/material'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
+import { Head, useForm, usePage } from '@inertiajs/react';
+import { Autocomplete } from '@mui/joy';
 import React, { useState } from 'react'
 
-const CreateReceipt = ({ tags, categories }) => {
+const CreateReceipt = ({ tags, categories, auth, status }) => {
 
+  const { flash } = usePage().props;
+  // console.log(tags);
   // collect all the data from inputs
-  const { data, setData, post, progress } = useForm({
+  const { data, setData, post, progress, errors } = useForm({
     name: '',
     description: '',
     category: '',
@@ -17,111 +20,169 @@ const CreateReceipt = ({ tags, categories }) => {
     ingredient: ''
   });
 
-  console.log(data.name, data.description, data.category, data.image, data.tag, data.ingredient_amount, data.make_time, data.ingredient);
+  console.log(flash.message);
   // handle for add a tag to array
   const handleTag = (event, tag) => {
     setData('tag', tag);
   }
 
+  // const handleCategory = (e, category) => {
+  //   setData('category', category);
+  // }
+
   // handle for store data
-  const handleSubmit = () => {
-    // e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
     post('/receipt');
   }
 
   return (
-    <div className="p-16" style={{ padding: 60 }}>
-      <h1 className="font-medium text-">Create Recipe</h1>
-      <Box
-        component="form"
-        sx={{
-          '& .MuiTextField-root': { my: 1, width: '50ch' },
-        }}
-        noValidate
-        autoComplete="off"
-        >
-        <div >
-          <TextField onChange={(e) => setData('name', e.target.value)} id="outlined-basic" label="Name" variant="outlined" />
-        </div>
-        <div>
-        <FormControl>
-          <FormLabel id="demo-radio-buttons-group-label">Category</FormLabel>
-          <RadioGroup
-            aria-labelledby="demo-radio-buttons-group-label"
-            defaultValue="female"
-            name="radio-buttons-group"
-          >
-            {categories.map((ctgr) => (
-              <FormControlLabel onChange={(e) => setData('category', ctgr.category)} value={ctgr.category} key={ctgr.id} control={<Radio />} label={ctgr.category} />
-            ))}
-          </RadioGroup>
-        </FormControl>
-        </div>
+    <AuthenticatedLayout user={auth}>
+      <Head title='Create Recipe' />
+      <div className="page-wrapper">
+      <div className="content container-fluid">
 
-        <div>
-          <label htmlFor="">Cover Image</label>
-          <div className="mt-1">
-            <input type="file" onChange={(e) => setData('cover', e.target.files[0])} />
-          </div>
-        </div>
+      <div className="page-header">
+      <div className="row">
+      <div className="col-sm-7 col-auto">
+      <h3 className="page-title">Add New Recipe</h3>
+      <ul className="breadcrumb">
+      <li className="breadcrumb-item active"><br/></li>
+      </ul>
+      </div>
 
-        <div style={{ marginTop: 15 }}>
-          <label htmlFor="">Multiple Image</label>
-          <div className="mt-1">
-            <input type="file" multiple onChange={(e) => setData('image', e.target.files)} />
-          </div>
-        </div>
-        <div className="mt-2">
-          <Autocomplete
-            multiple
-            id="tags-outlined"
-            options={tags}
-            getOptionLabel={(option) => option.tag}
-            // defaultValue={[top100Films[0]]}
-            onChange={handleTag}
-            Tag
-            
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Tag"
-                placeholder="Favorites"
-              />
-            )}
-          />
-        </div>
-        <div >
-          <TextField onChange={(e) => setData('ingredient_amount', e.target.value)} id="outlined-basic" label="Ingredient amounts" variant="outlined" />
-        </div>
-        <div >
-          <TextField onChange={(e) => setData('make_time', e.target.value)} id="outlined-basic" label="Make time" variant="outlined" />
-        </div>
-        <div>
-          <TextField
-            id="outlined-multiline-static"
-            label="Description"
-            multiline
-            rows={4}
-            onChange={(e) => setData('description', e.target.value)}
-          />
-        </div>
-        <div>
-          <TextField
-            id="outlined-multiline-static"
-            label="Ingredients"
-            multiline
-            rows={4}
-            onChange={(e) => setData('ingredient', e.target.value)}
-          />
-        </div>
-        <Button onClick={handleSubmit} variant="contained">Create</Button>
-        {/* <button  className="px-3 py-2 mt-2 bg-green-500 text-white rounded-md">Submit</button> */}
-      </Box>
-    </div>
+
+
+      <div className="row">
+      <div className="col-md-12">
+      <div className="card">
+
+      <div className="card-body">
+
+      <form onSubmit={handleSubmit}>
+      <div className="row">
+      <div className="col-xl-6">
+      <div className="form-group row">
+      <label className="col-lg-4 col-form-label">Recipe Name</label>
+      <div className="col-lg-8">
+      <input onChange={(e) => setData('name', e.target.value)} type="text" className="form-control" />
+      <p style={{ color: 'red' }}>{errors.name}</p>
+      </div>
+      </div>
+
+      <div className="form-group row">
+      <label className="col-lg-4 col-form-label">No of Incredients</label>
+      <div className="col-lg-8">
+      <input onChange={(e) => setData('ingredient_amount', e.target.value)} type="text" className="form-control"/>
+      <p style={{ color: 'red' }}>{errors.ingredient_amount}</p>
+      </div>
+      </div>
+
+      <div className="form-group row">
+      <label className="col-lg-4 col-form-label">Incredients</label>
+      <div className="col-lg-8">
+      <input onChange={(e) => setData('ingredient', e.target.value)} type="text" className="form-control"/>
+      <p style={{ color: 'red' }}>{errors.ingredient}</p>
+      </div>
+      </div>
+
+      <div className="form-group row">
+      <label className="col-lg-4 col-form-label">Preparation Method</label>
+      <div className="col-lg-8">
+      <textarea onChange={(e) => setData('description', e.target.value)} className="form-control" cols="5"></textarea>
+      <p style={{ color: 'red' }}>{errors.description}</p>
+      </div>
+      </div>
+
+      <div className="form-group row">
+      <label className="col-lg-4 col-form-label">Preparation Time</label>
+      <div className="col-lg-8">
+      <input onChange={(e) => setData('make_time', e.target.value)} type="text" className="form-control"/>
+      <p style={{ color: 'red' }}>{errors.make_time}</p>
+      </div>
+      </div>
+
+      </div>
+      <div className="col-xl-6">
+      <div className="form-group row">
+      <label className="col-lg-4 col-form-label">Category</label>
+      <div className="col-lg-8">
+      <select className="form-select" onChange={(e) => setData('category', e.target.value)}>
+      <option>Select</option>
+      {categories.map((ctgr) => (
+        <option key={ctgr.id} value={ctgr.category}>{ctgr.category}</option>
+      ))}
+      </select>
+      <p style={{ color: 'red' }}>{errors.category}</p>
+      </div>
+      </div>
+      {/* <div className="form-group row">
+      <label className="col-lg-4 col-form-label">Tags</label>
+      <div className="col-lg-8">
+      <input type="text" className="form-control" onChange={(e) => setData('tag', e.target.value)}/>
+      <p style={{ color: 'red' }}>{errors.tag}</p>
+      </div>
+      </div> */}
+      <div className="form-group row">
+      <label className="col-lg-4 col-form-label">Tags</label>
+      <div className="col-lg-8">
+        <Autocomplete
+          multiple
+          id="tags-default"
+          placeholder="Favorites"
+          options={tags}
+          getOptionLabel={(option) => option.tag}
+          onChange={handleTag}
+          // defaultValue={[tags[0]]}
+        />
+        <p style={{ color: 'red' }}>{errors.tag}</p>
+        
+      </div>
+      </div>
+      <div className="form-group row">
+      <label className="col-lg-4 col-form-label">Cover Image</label>
+      <div className="col-lg-8">
+      <input type="file" className="form-control" onChange={(e) => setData('cover', e.target.files[0])}/>
+      only jpg,png,jpeg allowed max size 512 kb
+      <p style={{ color: 'red' }}>{errors.cover}</p>
+      </div>
+      </div>
+
+      <div className="form-group row">
+      <label className="col-lg-4 col-form-label">Images</label>
+      <div className="col-lg-8">
+      <input type="file" className="form-control" multiple onChange={(e) => setData('image', e.target.files)}/>
+      only jpg,png,jpeg allowed max size 512 kb
+      <p style={{ color: 'red' }}>{errors.image}</p>
+      </div>
+      </div>
+
+
+      </div>
+
+      </div>
+      <div className="text-end">
+      {flash.message && (
+          <p style={{ color: 'red' }}>{flash.message}</p>
+        )}
+      <button type="submit" className="btn btn-primary">Submit</button>
+      </div>
+      </form>
+      </div>
+      </div>
+      </div>
+      </div>
+
+
+
+      </div>
+      </div>
+
+      </div>
+      </div>
+    </AuthenticatedLayout>
   )
 }
 
 export default CreateReceipt
-
-

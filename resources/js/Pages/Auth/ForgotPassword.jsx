@@ -1,9 +1,19 @@
 import Hero from '@/Components/Hero'
 import GuestLayout from '@/Layouts/GuestLayout'
-import { Head } from '@inertiajs/react'
+import { Head, useForm } from '@inertiajs/react'
 import React from 'react'
 
-const ForgotPassword = () => {
+const ForgotPassword = ({ status }) => {
+  const { data, setData, post, processing, errors } = useForm({
+    email: '',
+  });
+
+  const submit = (e) => {
+    e.preventDefault();
+
+    post(route('password.email'));
+  };
+
   return (
     <GuestLayout>
       <Head title="Forgot password" />
@@ -16,11 +26,14 @@ const ForgotPassword = () => {
               <div class="user-all-form">
                 <div class="contact-form">
                   <h3 class="text-center">Forgot Password</h3>
-                  <form id="contactForm">
+                  {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
+
+                  <form onSubmit={submit} id="contactForm">
                     <div class="row">
                       <div class="col-lg-12 ">
                         <div class="form-group">
-                        <input type="text" name="name" id="name" class="form-control" placeholder="Please enter your Email" />
+                        <input value={data.email} onChange={(e) => setData('email', e.target.value)} type="email" name="name" id="name" class="form-control" placeholder="Please enter your Email" />
+                        <p style={{ color: 'red' }}>{errors.email}</p>
                         </div>
                         </div>
                         <div class="col-lg-12 col-md-12 text-center">

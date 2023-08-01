@@ -13,7 +13,20 @@ import '/public/assets/css/meanmenu.min.css';
 import '/public/assets/css/style.css';
 import '/public/assets/css/responsive.css';
 import '/public/assets/css/theme-dark.css';
+import '/public/assets/css/style-self.css';
 
+// import jquery from '/public/user-dashboard-assets/js/jquery-3.6.4.min.js';
+
+
+import '/public/user-dashboard-assets/css/bootstrap.min.css';
+// import '/public/user-dashboard-assets/css/font-awesome.min.css';
+import '/public/user-dashboard-assets/css/feathericon.min.css';
+import '/public/user-dashboard-assets/plugins/morris/morris.css';
+import '/public/user-dashboard-assets/css/custom.css';
+
+// import '/public/user-dashboard-assets/plugins/slimscroll/jquery.slimscroll.min.js';
+// import '/public/user-dashboard-assets/plugins/raphael/raphael.min.js';
+// import '/public/user-dashboard-assets/plugins/morris/morris.min.js';
 
 
 import { createRoot } from 'react-dom/client';

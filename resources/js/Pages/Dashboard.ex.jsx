@@ -2,6 +2,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.ex';
 import { Head } from '@inertiajs/react';
 
 export default function Dashboard({ auth }) {
+    
+
     return (
         <AuthenticatedLayout
             user={auth.user}

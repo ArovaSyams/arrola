@@ -5,16 +5,18 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import Hero from '@/Components/Hero';
 
-const Login = ({ status, canResetPassword }) => {
+const Login = ({ message, status, canResetPassword }) => {
+  // const { errors } = usePage().props
+
   const { data, setData, post, processing, errors, reset } = useForm({
     email: '',
     password: '',
     remember: false,
   });
-
+  console.log(errors.email);
   useEffect(() => {
     return () => {
       reset('password');
@@ -39,16 +41,18 @@ const Login = ({ status, canResetPassword }) => {
               <div class="user-all-form">
                 <div class="contact-form">
                   <h3>Log In</h3>
-                  <form onSubmit={submit} id="contactForm">
+                  <form onSubmit={submit} id="contactForm">                    
                     <div class="row">
                       <div class="col-lg-12 ">
                         <div class="form-group">
                         <input value={data.email} onChange={(e) => setData('email', e.target.value)} type="text" name="email" id="email" class="form-control" placeholder="Email" />
+                        <p style={{ color: 'red' }}>{errors.email}</p>
                         </div>
                       </div>
                     <div class="col-12">
                       <div class="form-group">
                         <input value={data.password} onChange={(e) => setData('password', e.target.value)} class="form-control" type="password" name="password" placeholder="Password" />
+                        <p style={{ color: 'red' }}>{errors.password}</p>
                       </div>
                     </div>
                     <div class="col-lg-12 form-condition">

@@ -1,7 +1,7 @@
 import React from 'react'
 import ReceiptCards from './ReceiptCards'
 
-const Receipts = ({ receipts, images }) => {
+const Receipts = ({ receipts, images, user }) => {
   return (
     <div className="recent-recipe-area pt-100 pb-70">
       <div className="container">
@@ -13,6 +13,7 @@ const Receipts = ({ receipts, images }) => {
         <ReceiptCards 
           receipts={receipts} 
           images={images}
+          user={user}
         />
     </div>
   )

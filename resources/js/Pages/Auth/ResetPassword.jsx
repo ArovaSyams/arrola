@@ -1,90 +1,79 @@
-import { useEffect } from 'react';
-import GuestLayout from '@/Layouts/GuestLayout.ex';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import Hero from '@/Components/Hero';
+import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
+import React, { useEffect } from 'react'
 
-export default function ResetPassword({ token, email }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        token: token,
-        email: email,
-        password: '',
-        password_confirmation: '',
-    });
+const ResetPassword = ({ token, email }) => {
+  const { data, setData, post, processing, errors, reset } = useForm({
+    token: token,
+    email: email,
+    password: '',
+    password_confirmation: '',
+  });
 
-    useEffect(() => {
-        return () => {
-            reset('password', 'password_confirmation');
-        };
-    }, []);
-
-    const submit = (e) => {
-        e.preventDefault();
-
-        post(route('password.store'));
+  useEffect(() => {
+    return () => {
+      reset('password', 'password_confirmation');
     };
+  }, []);
 
-    return (
-        <GuestLayout>
-            <Head title="Reset Password" />
+  const submit = (e) => {
+    e.preventDefault();
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
+    post(route('password.store'));
+  };
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
+  return (
+    <GuestLayout>
+      <Head title="Reset Password" />
+      <Hero title="Reset Password" />
 
-                    <InputError message={errors.email} className="mt-2" />
+      <div class="user-area pt-100 pb-70">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-lg-12">
+              <div class="user-all-form">
+                <div class="contact-form">
+                  <h3>Log In</h3>
+                  <form onSubmit={submit} id="contactForm">                    
+                    <div class="row">
+                      <div class="col-lg-12 ">
+                        <div class="form-group">
+                        <input value={data.email} onChange={(e) => setData('email', e.target.value)} type="text" name="email" id="email" class="form-control" placeholder="Email" />
+                        <p style={{ color: 'red' }}>{errors.email}</p>
+                        </div>
+                      </div>
+                    <div class="col-12">
+                      <div class="form-group">
+                        <input value={data.password} onChange={(e) => setData('password', e.target.value)} class="form-control" type="password" name="password" placeholder="Password" />
+                        <p style={{ color: 'red' }}>{errors.password}</p>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="form-group">
+                        <input value={data.password_confirmation} onChange={(e) => setData('password_confirmation', e.target.value)} class="form-control" type="password" name="password" placeholder="Password Confirmation" />
+                        <p style={{ color: 'red' }}>{errors.password}</p>
+                      </div>
+                    </div>
+                    
+
+                    <div class="col-lg-12 col-md-12 text-center">
+                      <button type="submit" class="default-btn">
+                      Reset Password
+                      </button>
+                    </div>
+                    
+                    </div>
+                  </form>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        isFocused={true}
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-
-                    <TextInput
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                    />
-
-                    <InputError message={errors.password_confirmation} className="mt-2" />
-                </div>
-
-                <div className="flex items-center justify-end mt-4">
-                    <PrimaryButton className="ml-4" disabled={processing}>
-                        Reset Password
-                    </PrimaryButton>
-                </div>
-            </form>
-        </GuestLayout>
-    );
+    </GuestLayout>
+  )
 }
+
+export default ResetPassword

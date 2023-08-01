@@ -10,6 +10,7 @@ use App\Models\Image;
 use App\Models\Tag;
 use App\Models\TagList;
 use App\Models\User;
+use App\Models\VisitedPages;
 use Illuminate\Console\Application;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -27,8 +28,10 @@ class ReceiptController extends Controller
     {
 
         return Inertia::render('Home', [
-            'receipts' => Receipt::all(),
+            'receipts' => Receipt::where('status', 'active')->get(),
             'images' => Image::distinct('receipt_id')->get(),
+            'user' => User::all(),
+            'auth' => Auth::user()
             // 'canLogin' => Route::has('login'),
             // 'canRegister' => Route::has('register'),
             // 'laravelVersion' => Application::VERSION,
@@ -52,8 +55,29 @@ class ReceiptController extends Controller
      */
     public function store(Request $request)
     {
+        if($request->file('image') && count($request->file('image')) > 5 && count($request->tag) > 5) {
+            return redirect()->back()->with('message', 'Image & Tags cant contain more than 5');
+        }
+        if($request->file('image') && count($request->file('image')) > 5) {
+            return redirect()->back()->with('message', 'Image cant contain more than 5');
+        }
+        if(count($request->tag) > 5) {
+            return redirect()->back()->with('message', 'Tag cant more than 5 ');
+        }
         $uniqId = uniqid();
         
+        $request->validate([
+            'name' => 'required|unique:receipts,name',
+            'description' => 'required',
+            'category' => 'required',
+            'ingredient_amount' => 'required',
+            'make_time' => 'required',
+            'ingredient' => 'required',
+            'cover' => 'required|image',
+            'image' => 'required',
+            'tag' => 'required'
+        ]);
+
         Receipt::create([
             'unique_id' => $uniqId, 
             'user_id' => Auth::user()->id,
@@ -84,7 +108,7 @@ class ReceiptController extends Controller
             }
         }
 
-        return redirect('dashboard');
+        return redirect('receipt');
 
     }
 
@@ -93,15 +117,32 @@ class ReceiptController extends Controller
      */
     public function show($id)
     {
-        $receiptDetail = Receipt::where('unique_id', $id)->first();
-        $user = User::where('id', $receiptDetail->user_id)->first();
+        
+        $idName = str_replace('-', ' ', $id);
+        $receiptDetail = Receipt::where('name', $idName)->first();
 
+        if(Auth::user()) {
+            if($receiptDetail->status == 'Inactive' && Auth::user()->role != 'admin') {
+                return redirect()->back();
+            }
+        } else if ($receiptDetail->status == 'Inactive') {
+            return redirect()->back();
+        }
+
+        $user = User::where('id', $receiptDetail->user_id)->first();
+        $auth = ''; 
+        if (Auth::user()) {
+            $auth = Auth::user()->id;
+        }
         return Inertia::render('ReceiptDetail', [
-            'authUser' => Auth::user()->id,
+            'authUser' => $auth,
             'user' => $user,
             'receipt' => $receiptDetail,
             'tags' => Tag::where('receipt_id', $receiptDetail->unique_id)->get(),
-            'images' => Image::where('receipt_id', $receiptDetail->unique_id)->get()
+            'images' => Image::where('receipt_id', $receiptDetail->unique_id)->get(),
+            'visited' => VisitedPages::where('user_id', $auth)->where('receipt_id', $receiptDetail->unique_id)->first(),
+            'visitedData' => VisitedPages::count(),
+            'isAuth' => Auth::user()
         ]);
     }
 
@@ -110,9 +151,12 @@ class ReceiptController extends Controller
      */
     public function edit($id)
     {
-        $receipt = Receipt::where('unique_id', $id)->first();
-        $images = Image::where('receipt_id', $id)->get();
-        $tags = Tag::where('receipt_id', $id)->get();
+        $replaceStr = str_replace('-', ' ', $id);
+        $receiptId = Receipt::where('name', $replaceStr)->first();
+        // dd($receiptId->unique_id);
+        $receipt = Receipt::where('unique_id', $receiptId->unique_id)->first();
+        $images = Image::where('receipt_id', $receiptId->unique_id)->get();
+        $tags = Tag::where('receipt_id', $receiptId->unique_id)->get();
 
         return Inertia::render('EditReceipt', [
             'receipt' => $receipt,
@@ -120,14 +164,29 @@ class ReceiptController extends Controller
             'tagList' => TagList::all(),
             'images' => $images,
             'tags' => $tags,
+            'auth' => Auth::user()
         ]);
     }
-
+    
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
     {
+        
+        if(count($request->tag) > 5) {
+            return redirect()->back()->with('message', "Tag cant more than 5");
+        }
+        // dd($request);
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'category' => 'required',
+            'ingredient_amount' => 'required',
+            'make_time' => 'required',
+            'ingredient' => 'required',
+        ]);
+
         
         Receipt::where('unique_id', $id)->update([
             'name' => $request->name,
@@ -137,7 +196,14 @@ class ReceiptController extends Controller
             'make_time' => $request->make_time,
             'ingredient' => $request->ingredient,
         ]);
-       
+
+        // if status is active
+        $isActive = Receipt::where('unique_id', $id)->first();
+        if($isActive->status === 'Active') {
+            $receipt = $isActive;
+            $receipt->status = 'Inactive';
+            $receipt->save();
+        }
         // update Tag
         $existingTag = Tag::where('receipt_id', $id)->get();
         if($request->tag) {
@@ -153,7 +219,7 @@ class ReceiptController extends Controller
             }
         }
 
-        return redirect('dashboard');
+        return redirect('receipt');
     }
 
     /**
@@ -164,6 +230,10 @@ class ReceiptController extends Controller
         $receipt = Receipt::where('unique_id', $id)->first();
         $images = Image::where('receipt_id', $id)->get();
         $tags = Tag::where('receipt_id', $id)->get();
+
+        if($receipt->cover) {
+            Storage::delete($receipt->cover);
+        }
 
         if($images) {
             foreach($images as $img) {
@@ -180,6 +250,6 @@ class ReceiptController extends Controller
 
         $receipt->delete();
 
-        return redirect('dashboard');
+        return redirect()->back();
     }
 }
